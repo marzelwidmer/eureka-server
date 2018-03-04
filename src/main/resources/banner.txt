@@ -1,0 +1,11 @@
+${AnsiColor.BRIGHT_BLUE}
+${AnsiColor.BRIGHT_BLUE}
+${AnsiColor.BRIGHT_BLUE} _______           _______  _______  _        _______                   eureka.environment:${eureka.environment}
+${AnsiColor.BRIGHT_BLUE}(  ____ \|\     /|(  ____ )(  ____ \| \    /\(  ___  )                  spring.profiles: ${spring.profiles.active}
+${AnsiColor.BRIGHT_BLUE}| (    \/| )   ( || (    )|| (    \/|  \  / /| (   ) |                  ${spring.application.name}
+${AnsiColor.BRIGHT_BLUE}| (__    | |   | || (____)|| (__    |  (_/ / | (___) | _____            ${info.build.version}
+${AnsiColor.BRIGHT_BLUE}|  __)   | |   | ||     __)|  __)   |   _ (  |  ___  |(_____)           address:${spring.cloud.client.hostname}
+${AnsiColor.BRIGHT_BLUE}| (      | |   | || (\ (   | (      |  ( \ \ | (   ) |
+${AnsiColor.BRIGHT_BLUE}| (____/\| (___) || ) \ \__| (____/\|  /  \ \| )   ( |
+${AnsiColor.BRIGHT_BLUE}(_______/(_______)|/   \__/(_______/|_/    \/|/     \|
+${AnsiColor.BRIGHT_BLUE}

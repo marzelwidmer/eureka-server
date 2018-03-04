@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>ch.keepcalm.microservice</groupId>
+	<artifactId>eureka-server</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<packaging>jar</packaging>
+
+	<name>eureka-server</name>
+	<description>Service Discovery - Eureka instances can be registered and clients can discover the instances using Spring-managed beans</description>
+
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>1.5.10.RELEASE</version>
+		<relativePath /> <!-- lookup parent from repository -->
+	</parent>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<java.version>1.8</java.version>
+
+		<!-- ================= Spring ===================== -->
+		<!-- Spring Cloud -->
+		<spring-cloud.version>Edgware.SR2</spring-cloud.version>
+		<!-- spring-boot-admin -->
+		<spring-boot-admin-starter-client.version>1.5.5</spring-boot-admin-starter-client.version>
+
+		<!-- ================= Package / Release ===================== -->
+		<!-- Maven -->
+		<!-- Package / Release -->
+		<maven-site-plugin.version>3.4</maven-site-plugin.version>
+		<maven-resources-plugin.version>2.7</maven-resources-plugin.version>
+		<maven-javadoc-plugion>2.10.3</maven-javadoc-plugion>
+		<maven-deploy-plugin>2.8.2</maven-deploy-plugin>
+		<maven-source-plugin>2.4</maven-source-plugin>
+		<!-- jGitFlow -->
+		<jgitflow-maven-plugin.version>1.0-m5.1</jgitflow-maven-plugin.version>
+		<!-- Used for Nexus Upload -->
+		<wagon-webdav-jackrabbit.version>2.4</wagon-webdav-jackrabbit.version>
+
+	</properties>
+
+
+
+	<dependencies>
+		<dependency>
+			<groupId>de.codecentric</groupId>
+			<artifactId>spring-boot-admin-starter-client</artifactId>
+			<version>${spring-boot-admin-starter-client.version}</version>
+		</dependency>
+
+		<!-- spring-cloud -->
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-config</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-eureka-server</artifactId>
+		</dependency>
+
+
+		<!-- spring-boot -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<!-- Build -->
+	<build>
+		<finalName>${project.name}-${project.version}</finalName>
+		<!-- Used for Nexus Upload -->
+		<extensions>
+			<extension>
+				<groupId>org.apache.maven.wagon</groupId>
+				<artifactId>wagon-webdav-jackrabbit</artifactId>
+				<version>${wagon-webdav-jackrabbit.version}</version>
+			</extension>
+		</extensions>
+		<!-- Plugins -->
+		<plugins>
+			<!-- Spring-Boot -->
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+
+			<!-- Git information -->
+			<plugin>
+				<groupId>pl.project13.maven</groupId>
+				<artifactId>git-commit-id-plugin</artifactId>
+			</plugin>
+			<!-- jGitFlow -->
+			<plugin>
+				<groupId>external.atlassian.jgitflow</groupId>
+				<artifactId>jgitflow-maven-plugin</artifactId>
+				<version>${jgitflow-maven-plugin.version}</version>
+				<configuration>
+					<!--Keep maven sub modules in same version as parent-->
+					<autoVersionSubmodules>true</autoVersionSubmodules>
+					<pushFeatures>true</pushFeatures>
+					<pushReleases>true</pushReleases>
+					<pushHotfixes>true</pushHotfixes>
+					<suppressFastForward>true</suppressFastForward>
+					<scmCommentPrefix>jgf:</scmCommentPrefix>
+					<!--enforce line ending-->
+					<eol>lf</eol>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+	<!-- Profiles -->
+	<profiles>
+		<!--  release-dry-run-->
+		<profile>
+			<id>release-dry-run</id>
+			<!--Deploy artifacts to nexus PRE-PROD-->
+			<distributionManagement>
+				<snapshotRepository>
+					<id>snapshots</id>
+					<name>Helsana Snapshots auf Alma Entw.</name>
+					<url>http://alma-artifact-entw.hel.kko.ch/nexus/repository/snapshots/</url>
+				</snapshotRepository>
+
+				<repository>
+					<id>releases</id>
+					<name>Helsana Releases auf Alma Entw.</name>
+					<url>http://alma-artifact-entw.hel.kko.ch/nexus/repository/releases/</url>
+				</repository>
+			</distributionManagement>
+
+			<!--Perform release without tagging origin/master-->
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>external.atlassian.jgitflow</groupId>
+						<artifactId>jgitflow-maven-plugin</artifactId>
+						<version>${jgitflow-maven-plugin.version}</version>
+						<configuration>
+							<!--do not push release branch -->
+							<pushReleases>false</pushReleases>
+							<pushHotfixes>false</pushHotfixes>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+		<!-- release -->
+		<profile>
+			<id>release</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<!-- Distribution -->
+			<distributionManagement>
+				<repository>
+					<id>releases</id>
+					<url>dav:http://alma-artifact/nexus/content/repositories/releases/</url>
+				</repository>
+				<snapshotRepository>
+					<uniqueVersion>false</uniqueVersion>
+					<id>snapshots</id>
+					<url>dav:http://alma-artifact/nexus/content/repositories/snapshots/</url>
+				</snapshotRepository>
+			</distributionManagement>
+		</profile>
+	</profiles>
+
+	<!-- SpringCloud -->
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-dependencies</artifactId>
+				<version>${spring-cloud.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+</project>
